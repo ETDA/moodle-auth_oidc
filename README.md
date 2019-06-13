@@ -6,6 +6,12 @@ This plugin has been folk for support basic authentication in header for the ind
 
 For the original active development plug in , see: https://github.com/Microsoft/o365-moodle
 
+## Remark
+
+This moodle plugin is not provide the data exchange between Relying party and Resource server.
+
+The plugin has been folk for support scope of Openid and Profile only.
+
 ## Installation
 
 1. Unpack the plugin into /auth/oidc within your Moodle install.
