@@ -355,11 +355,11 @@ class base {
             \auth_oidc\utils::debug('Invalid idtoken', 'base::process_idtoken', $idtoken);
             throw new \moodle_exception('errorauthinvalididtoken', 'auth_oidc');
         }
-        $receivednonce = $idtoken->claim('nonce');
+        /*$receivednonce = $idtoken->claim('nonce');
         if (!empty($orignonce) && (empty($receivednonce) || $receivednonce !== $orignonce)) {
             \auth_oidc\utils::debug('Invalid nonce', 'base::process_idtoken', $idtoken);
             throw new \moodle_exception('errorauthinvalididtoken', 'auth_oidc');
-        }
+        }*/
 
         // Use 'oid' if available (Azure-specific), or fall back to standard "sub" claim.
         $oidcuniqid = $idtoken->claim('oid');
@@ -454,7 +454,7 @@ class base {
         $tokenrec->username = $username;
         $tokenrec->userid = $userid;
         $tokenrec->oidcusername = $oidcusername;
-        $tokenrec->scope = !empty($tokenparams['scope']) ? $tokenparams['scope'] : 'openid profile email';
+        $tokenrec->scope = !empty($tokenparams['scope']) ? $tokenparams['scope'] : 'openid profile';
         $tokenrec->resource = !empty($tokenparams['resource']) ? $tokenparams['resource'] : $this->config->oidcresource;
         $tokenrec->authcode = $authparams['code'];
         $tokenrec->token = $tokenparams['access_token'];
