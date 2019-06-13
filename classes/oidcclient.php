@@ -62,7 +62,7 @@ class oidcclient {
         $this->clientid = $id;
         $this->clientsecret = $secret;
         $this->redirecturi = $redirecturi;
-        $this->resource = (!empty($resource)) ? $resource : 'https://graph.windows.net';
+        //$this->resource = (!empty($resource)) ? $resource : 'https://graph.windows.net';
     }
 
     /**
@@ -127,21 +127,22 @@ class oidcclient {
      * @param array $extraparams Additional parameters to send with the OIDC request.
      * @return array Array of request parameters.
      */
-    protected function getauthrequestparams($promptlogin = false, array $stateparams = array(), array $extraparams = array()) {
+    protected function getauthrequestparams($promptlogin = true, array $stateparams = array(), array $extraparams = array()) {
         $nonce = 'N'.uniqid();
         $params = [
             'response_type' => 'code',
             'client_id' => $this->clientid,
-            'scope' => 'openid profile email',
-            'nonce' => $nonce,
+            'scope' => 'openid profile',
+            //'nonce' => $nonce,
             'response_mode' => 'form_post',
             'resource' => $this->resource,
             'state' => $this->getnewstate($nonce, $stateparams),
-            'redirect_uri' => $this->redirecturi
+            'redirect_uri' => $this->redirecturi,
+			'prompt' => 'login consent'
         ];
-        if ($promptlogin === true) {
-            $params['prompt'] = 'login';
-        }
+        /*if ($promptlogin === true) {
+            $params['prompt'] = 'login consent';
+        }*/
 
         $domainhint = get_config('auth_oidc', 'domainhint');
         if (!empty($domainhint)) {

@@ -34,7 +34,7 @@ class httpclient extends \curl implements \auth_oidc\httpclientinterface {
      *
      * @return string A client tag.
      */
-    protected function get_clienttag_headers() {
+    protected function get_clienttag_headers($client_id,$client_secret) {
         global $CFG;
 
         $iid = sha1($CFG->wwwroot);
@@ -43,12 +43,14 @@ class httpclient extends \curl implements \auth_oidc\httpclientinterface {
         $osver = php_uname('r');
         $arch = php_uname('m');
         $ver = $this->get_plugin_version();
-
-        $params = "lang=PHP; os={$ostype}; os_version={$osver}; arch={$arch}; version={$ver}; MoodleInstallId={$iid}";
+		$encode = base64_encode($client_id.':'.$client_secret);
+        $params = "lang=PHP; os={$ostype}; os_version={$osver}; arch={$arch}; version={$ver}; MoodleInstallId={$iid};";
         $clienttag = "Moodle/{$mdlver} ({$params})";
         return [
             'User-Agent: '.$clienttag,
             'X-ClientService-ClientTag: '.$clienttag,
+			'Content-Type: application/x-www-form-urlencoded',
+			'Authorization: Basic '.$encode
         ];
     }
 
@@ -82,7 +84,7 @@ class httpclient extends \curl implements \auth_oidc\httpclientinterface {
      * @return bool
      */
     protected function request($url, $options = array()) {
-        $this->setHeader($this->get_clienttag_headers());
+        //$this->setHeader($this->get_clienttag_headers());
         $result = parent::request($url, $options);
         $this->resetHeader();
         return $result;
@@ -98,9 +100,15 @@ class httpclient extends \curl implements \auth_oidc\httpclientinterface {
      */
     public function post($url, $params = '', $options = array()) {
         // Encode data to disable uploading files when values are prefixed @.
-        if (is_array($params)) {
+		//\auth_oidc\utils::debug('', 'function post $params[client_id] before : ', $params[client_id]);
+		//\auth_oidc\utils::debug('', 'function post $params[client_secret] before : ', $params[client_secret]);
+        $client_id = $params[client_id];
+		$client_secret = $params[client_secret];
+ 		$this->setHeader($this->get_clienttag_headers($client_id,$client_secret));
+		if (is_array($params)) {
             $params = http_build_query($params, '', '&');
         }
+		
         return parent::post($url, $params, $options);
     }
 }
